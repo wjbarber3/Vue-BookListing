@@ -1,10 +1,17 @@
 <template>
   <div>
     <h1>{{title}}</h1>
+    <div v-if="loading">Loading Content</div>
     <ul>
-      <book-item v-for="book in books" :book="book"></book-item>
+      <book-item
+        v-for="(book, index) in books"
+        v-bind:key="book.title"
+        :book="book"
+        :index="index"
+        @removeBook="deleteBook"></book-item>
       <book-form @addBook="appendBook"></book-form>
     </ul>
+    <!-- <button>Save</button> -->
   </div>
 </template>
 
@@ -18,10 +25,17 @@ export default {
   data() {
     return {
       title: 'All Books',
-      books: [
-        {title: 'Self-Reliance', author: 'Ralph Waldo Emerson'},
-        {title: 'American Gods', author: 'Neil Gaiman'},
-        {title: 'Amusing Ourselves to Death', author: 'Neil Postman'},
+      books: [],
+      loading: false,
+      newContent: [
+        {
+          "title": "Wind Up Bird Chronical",
+          "author": "Haruki Murakami"
+        },
+        {
+          "title": "In The Miso Soup",
+          "author": "Ryu Murakami"
+        },
       ]
     }
   },
@@ -35,8 +49,27 @@ export default {
         title: bookTitle,
         author: bookAuthor
       })
+      let xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
+      xmlhttp.open("PUT", "http://localhost:3000/books");
+      xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      xmlhttp.send(this.books);
+    },
+    deleteBook(index) {
+      this.books.splice(index, 1);
+    },
+    getAllBooks() {
+      this.loading = true;
+      fetch('http://localhost:3000/books')
+      .then(response => response.json())
+      .then(data => {
+        this.books = data;
+        this.loading = false;
+      });
     }
-  }
+  },
+  created: function() {
+    this.getAllBooks();
+  },
 }
 
 </script>

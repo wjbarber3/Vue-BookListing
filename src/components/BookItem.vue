@@ -1,12 +1,20 @@
 <template>
-  <li>{{book.title}}: {{book.author}}</li>
+  <li>{{book.title}}: {{book.author}} <span v-on:click="bookDelete(index)">x</span></li>
 </template>
 
 <script>
   
   export default {
     name: 'BookItem',
-    props: [ 'book' ]
+    props: {
+      book: {},
+      index: Number
+    },
+    methods: {
+      bookDelete(index) {
+        this.$emit('removeBook', index)
+      }
+    }
   }
 </script>
 
